@@ -1,10 +1,10 @@
-# immo-clojure2
+# immo-clojure
 
-A Clojure library designed to ... well, that part is up to you.
+A small web scrapper in Clojure.
 
 ## Usage
 
-FIXME
+'lein deps && lein run'
 
 ## License
 
