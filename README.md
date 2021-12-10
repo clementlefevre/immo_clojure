@@ -4,7 +4,7 @@ A small web scrapper in Clojure.
 
 ## Usage
 
-'lein deps && lein run'
+`lein deps && lein run`
 
 ## License
 
