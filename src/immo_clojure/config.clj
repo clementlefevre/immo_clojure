@@ -1,29 +1,26 @@
-(ns immo-clojure.config (:require  [cheshire.core :as cc] [cemerick.url :refer (url)]))
+(ns immo-clojure.config (:require [clojure.pprint  :refer [pprint] :rename {pprint p}] [cheshire.core :as cc] [cemerick.url :refer (url)]))
 
 
 
-(defn load-config []
-  (let [json-data (slurp "resources/config.json")]
+(defn load-file [filepath]
+  (let [json-data (slurp filepath)]
     (cc/parse-string json-data true)))
 
-(clojure.pprint/pprint (load-config))
-
-(def config-data (load-config))
 
 (defn get-host [map-config]
-  (get (url (get map-config :url)) :host))
+  (get (url (get map-config :url-kaufen)) :host))
 
 
-(def config-full (map #(assoc % :root (get-host %)) config-data))
+(defn get-tags [map-config]
+  (let [arr  (clojure.string/split (get map-config :xpath_listing) #"\ ")]
+    (mapv #(keyword (clojure.string/replace % #":" "")) arr)))
 
-(clojure.pprint/pprint config-full)
+(defn parse-config [raw-conf]
+  (assoc raw-conf  :root-url (get-host raw-conf) :xpath_listing (get-tags raw-conf)))
 
-(def test-str (get (first config-full) :xpath_listing))
+(defn load-conf [filepath]  (map #(parse-config %) (load-file filepath)))
+(p (load-conf "resources/config.json"))
 
-(defn parse-json-string [s]
-  (let [arr  (clojure.string/split s #"\ ")]
 
-    (map #(clojure.string/replace % #":" "") arr)))
 
-(def x (parse-json-string test-str))
-(keyword (first x))
+

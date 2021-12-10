@@ -1,34 +1,50 @@
-(ns immo-clojure.core (:require   [clojure.pprint :as p] [net.cgrand.enlive-html :as html]
-                                  [cemerick.url :refer (url)]
-                                  [taoensso.timbre :as timbre]
-                                  [taoensso.timbre.appenders.core :as appenders]))
-
-
-(timbre/merge-config!
- {:appenders {:spit (appenders/spit-appender {:fname "immo.log"})}})
-(timbre/merge-config! {:appenders {:hostname_ "cououc"}})
-(timbre/get-hostname)
-(timbre/info "Test Logging")
+(ns immo-clojure.core (:require [clojure.string]
+                                [immo-clojure.config]
+                                [immo-clojure.scrapper]
+                                [immo-clojure.job]
+                                [clojure.data.json :as json]))
 
 
 
-(def url-main-page "https://www.krentz.de/immobilien/kaufen/")
+(def all-conf  (immo-clojure.config/load-conf "resources/config.json"))
 
 
 
-(defn get-links [url tags]
-  (let [content (-> url
-                    (java.net.URL.)
-                    (html/html-resource)
-                    (html/select tags))]
-    (mapcat #(html/attr-values % :href) content)))
+(defn iterate-scrap [url-base tags last-page page-index all-results]
+  (while (false? @last-page)
+    (try
+      (let [result (immo-clojure.scrapper/get-links  (str url-base @page-index) tags)]
+        (swap!  all-results concat  result)
+        (println (format "page : %s - offers found : %s" @page-index (count result))))
+      (swap! page-index inc)
+      (catch Exception  e
+        ;(println e)
+        (println "last page reached.")
+        (reset! last-page true)))))
 
-(def page-content (get-links url-main-page [:div.objekt-item-inner-text :a]))
-(p/pprint page-content)
 
-(get (url url-main-page) :host)
+(defn recur-get-links [url-base tags]
+  (let [last-page (atom false) page-index (atom 1) all-results (atom [])]
+    (iterate-scrap url-base tags last-page page-index all-results)
+    (#(deref all-results))))
 
-(def root-url (get (url url-main-page) :host))
-(p/pprint root-url)
-(map #(str (format "%s%s" root-url %)) page-content)
+(defn links-from-conf [conf]
+  (if (clojure.string/blank? (:next_page_prefix conf))
+    (hash-map :url (:root-url conf) :results (immo-clojure.scrapper/get-links (:url-kaufen conf) (:xpath_listing conf)))
+    (hash-map :url (:root-url conf) :results (recur-get-links (str (:url-kaufen conf) (:next_page_prefix conf)) (:xpath_listing conf)))))
+
+(def results (map #(links-from-conf %) all-conf))
+
+(defn drop-dupes [all-results]
+  (let [unique-results (map #(hash-map :url (:url %) :results (set (:results %))) all-results)]
+    (doall unique-results)))
+
+(clojure.pprint/pprint (drop-dupes results))
+(immo-clojure.job/store-results (drop-dupes results) "_all")
+
+(def loaded-results (json/read-str (slurp "test__all.json")
+                                   :key-fn keyword))
+
+(clojure.pprint/pprint loaded-results)
+
 
