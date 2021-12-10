@@ -17,4 +17,13 @@
 (def config-full (map #(assoc % :root (get-host %)) config-data))
 
 (clojure.pprint/pprint config-full)
-(cc/parse-string ((first config-full) :xpath_listing))
+
+(def test-str (get (first config-full) :xpath_listing))
+
+(defn parse-json-string [s]
+  (let [arr  (clojure.string/split s #"\ ")]
+
+    (map #(clojure.string/replace % #":" "") arr)))
+
+(def x (parse-json-string test-str))
+(keyword (first x))
