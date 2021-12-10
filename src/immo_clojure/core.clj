@@ -1,14 +1,14 @@
-(ns immo-clojure2.core (:require   [clojure.pprint :as p] [net.cgrand.enlive-html :as html]
-                                   [cemerick.url :refer (url)]
-                                   [taoensso.timbre :as timbre]
-                                   [taoensso.timbre.appenders.core :as appenders]))
+(ns immo-clojure.core (:require   [clojure.pprint :as p] [net.cgrand.enlive-html :as html]
+                                  [cemerick.url :refer (url)]
+                                  [taoensso.timbre :as timbre]
+                                  [taoensso.timbre.appenders.core :as appenders]))
 
 
 (timbre/merge-config!
- {:appenders {:spit (appenders/spit-appender {:fname "immo2.log"})}})
+ {:appenders {:spit (appenders/spit-appender {:fname "immo.log"})}})
 (timbre/merge-config! {:appenders {:hostname_ "cououc"}})
 (timbre/get-hostname)
-(timbre/info "This will print")
+(timbre/info "Test Logging")
 
 
 

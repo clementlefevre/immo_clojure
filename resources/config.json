@@ -1,0 +1,6 @@
+[
+    {
+        "url": "https://www.kirschundkirsch.de/kaufen.html",
+        "xpath_listing": "[:div.objekt-item-inner-text :a]"
+    }
+]
