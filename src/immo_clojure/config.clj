@@ -1,8 +1,8 @@
-(ns immo-clojure.config (:require [clojure.pprint  :refer [pprint] :rename {pprint p}] [cheshire.core :as cc] [cemerick.url :refer (url)]))
+(ns immo-clojure.config (:require [clojure.string] [clojure.pprint  :refer [pprint] :rename {pprint p}] [cheshire.core :as cc] [cemerick.url :refer (url)]))
 
 
 
-(defn load-file [filepath]
+(defn load-config-file [filepath]
   (let [json-data (slurp filepath)]
     (cc/parse-string json-data true)))
 
@@ -18,7 +18,7 @@
 (defn parse-config [raw-conf]
   (assoc raw-conf  :root-url (get-host raw-conf) :xpath_listing (get-tags raw-conf)))
 
-(defn load-conf [filepath]  (map #(parse-config %) (load-file filepath)))
+(defn load-conf [filepath]  (map #(parse-config %) (load-config-file filepath)))
 (p (load-conf "resources/config.json"))
 
 

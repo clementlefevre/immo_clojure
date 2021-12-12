@@ -1,8 +1,10 @@
 (ns immo-clojure.core (:require [clojure.string]
+                                [clojure.pprint]
                                 [immo-clojure.config]
                                 [immo-clojure.scrapper]
                                 [immo-clojure.job]
                                 [clojure.data.json :as json]))
+
 
 
 
@@ -34,6 +36,8 @@
     (hash-map :url (:root-url conf) :results (recur-get-links (str (:url-kaufen conf) (:next_page_prefix conf)) (:xpath_listing conf)))))
 
 (def results (map #(links-from-conf %) all-conf))
+
+(clojure.pprint/pprint results)
 
 (defn drop-dupes [all-results]
   (let [unique-results (map #(hash-map :url (:url %) :results (set (:results %))) all-results)]

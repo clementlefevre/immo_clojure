@@ -1,6 +1,12 @@
 [
     {
-        "url": "https://www.kirschundkirsch.de/kaufen.html",
-        "xpath_listing": ":div.objekt-item-inner-text :a"
+        "url-kaufen": "https://www.krentz.de/immobilien/kaufen/",
+        "xpath_listing": ":div.objekt-template-list :a",
+        "next_page_prefix": ""
+    },
+    {
+        "url-kaufen": "https://www.kirschundkirsch.de/kaufen.html",
+        "xpath_listing": ":div.layout_latest.arc_1.block :a",
+        "next_page_prefix": "?page_n10="
     }
 ]
